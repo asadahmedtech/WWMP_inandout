@@ -1,4 +1,4 @@
-from keras.model import Sequential
+from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras import regularizers
 
@@ -9,10 +9,9 @@ def create_network(input_dims, output_dims, neuron_layers, dropout_threshold, re
 	layers = list()
 
 	for i, val in enumerate(neuron_layers):
-		
 		# Initial Layer
 		if(i == 0):
-			layers.append(Dense(val, activation = 'relu', kernel_regularizer = regularizers.l2(regularizer_threshold), input_shape = (input_dims, 0)))
+			layers.append(Dense(val, activation = 'relu', kernel_regularizer = regularizers.l2(regularizer_threshold), input_shape = (input_dims, )))
 			if(dropout_threshold[i] != 0):
 				layers.append(Dropout(dropout_threshold[i]))
 		# Last Layer

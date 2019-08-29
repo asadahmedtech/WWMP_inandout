@@ -3,15 +3,15 @@ import numpy as np
 import os
 
 from sklearn import preprocessing 
-from sklear.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 
 
-def load_data(filename, input_dims, output_dims, filepath = '../dataset/', normalize = False, verbose = False):
+def load_data(filename, input_dims, output_dims, filepath = '../dataset', normalize = False, verbose = False):
 
 	# Loadomg the CSV files 
 	if(verbose):
 		print("==> Loading CSV dataset")
-	data = pd.read_csv(os.path.join(filepath, filename))
+	data = pd.read_csv('../dataset/data.csv')
 
 	#Target labels
 	target_labels = data.columns[input_dims:input_dims + output_dims]
@@ -21,8 +21,7 @@ def load_data(filename, input_dims, output_dims, filepath = '../dataset/', norma
 	target_data = data[target_labels]
 	train_data = data.drop(target_labels, axis = 1)
 
-	if(other_labels != []):
-		train_data = data.drop(other_labels, axis = 1)
+	train_data = train_data.drop(other_labels, axis = 1)
 
 	del data
 

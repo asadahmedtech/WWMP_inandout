@@ -30,14 +30,30 @@ args = parser.parse_args()
 
 _start_time = get_start_time()
 
-hyper_param_search = [{'input_dims' : 13, 'output_dims' : 1, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 13, 'output_dims' : 1, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
-	{'input_dims' : 13, 'output_dims' : 1, 'neuron_layer' : [500, 200, 100, 10], 'dropout_threshold' : [0, 0.50, 0.5, 0.6, 0.5, 0.4], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 13, 'output_dims' : 3, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 13, 'output_dims' : 3, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
-	{'input_dims' : 13, 'output_dims' : 13, 'neuron_layer' : [100, 50, 5, 50, 100], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 13, 'output_dims' : 13, 'neuron_layer' : [200, 100, 50, 100, 200], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
+hyper_param_search = [{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
+	{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [500, 200, 100, 10], 'dropout_threshold' : [0, 0.50, 0.5, 0.6, 0.5, 0.4], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 3, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 3, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
+	{'input_dims' : 10, 'output_dims' : 14, 'neuron_layer' : [100, 50, 5, 50, 100], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 14, 'neuron_layer' : [200, 100, 50, 100, 200], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
 	]
+
+import tensorflow as tf
+from keras import backend as k
+ 
+###################################
+# TensorFlow wizardry
+config = tf.ConfigProto()
+ 
+# Don't pre-allocate memory; allocate as-needed
+config.gpu_options.allow_growth = True
+ 
+# Only allow a total of half the GPU memory to be allocated
+config.gpu_options.per_process_gpu_memory_fraction = 0.3
+ 
+# Create a session with the above options specified.
+k.tensorflow_backend.set_session(tf.Session(config=config))
 
 # Running Multiple Models for Training and saving the files
 for model_ver in hyper_param_search:
@@ -51,10 +67,10 @@ for model_ver in hyper_param_search:
 	# Defining the callbacks for training 
 	tensorboard = TensorBoard(log_dir=TBLOGDIR, histogram_freq=0, batch_size=args.batch_size)
 
-	model = create_network(model_ver['input_dims'], model_ver['input_dims'], model_ver['output_dims'], model_ver['neuron_layer'], model_ver['dropout_threshold'], model_ver['regularizer_threshold'])
+	model = create_network(model_ver['input_dims'], model_ver['output_dims'], model_ver['neuron_layer'], model_ver['dropout_threshold'], model_ver['regularizer_threshold'])
 
 	model.compile(loss = losses.mean_squared_error, optimizer = model_ver['opt'])
-	model.fit(X_train, Y_train, epochs = args.epochs, verbose = args.verbose, validation_data = (X_val, Y_val), callbacks = [tensorboard], metrics = ['mae'])
+	model.fit(X_train, Y_train, epochs = args.epochs, verbose = args.verbose, validation_data = (X_val, Y_val), callbacks = [tensorboard])
 	scores = model.evaluate(X_test, Y_test, verbose=args.verbose)
 
 	print("===> Scores : ", model_ver, scores)
