@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter
 )
 parser.add_argument('--data_file', default='data.csv', type=input_dir, help='Data file for training.')
-parser.add_argument('--lr', default=0.001, type=float, help='learning rate') # NOTE change for diff models
+parser.add_argument('--lr', default=0.0001, type=float, help='learning rate') # NOTE change for diff models
 parser.add_argument('--batch_size', default=32, type=int)
 parser.add_argument('--split_ratio', default=0.3, type=float, help='split ratio for traing and validation')
 parser.add_argument('--resume', '-r', type=int, default=0, help='resume from checkpoint')
@@ -30,13 +30,13 @@ args = parser.parse_args()
 
 _start_time = get_start_time()
 
-hyper_param_search = [{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
-	{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [500, 200, 100, 10], 'dropout_threshold' : [0, 0.50, 0.5, 0.6, 0.5, 0.4], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 10, 'output_dims' : 3, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 10, 'output_dims' : 3, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
-	{'input_dims' : 10, 'output_dims' : 14, 'neuron_layer' : [100, 50, 5, 50, 100], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.01, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
-	{'input_dims' : 10, 'output_dims' : 14, 'neuron_layer' : [200, 100, 50, 100, 200], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.01, 'opt' : optimizers.Adam(lr=args.lr)},
+hyper_param_search = [{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.1, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.1, 'opt' : optimizers.Adam(lr=args.lr)},
+	{'input_dims' : 10, 'output_dims' : 1, 'neuron_layer' : [500, 200, 100, 10], 'dropout_threshold' : [0, 0.50, 0.5, 0.6, 0.5, 0.4], 'regularizer_threshold' : 0.1, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 3, 'neuron_layer' : [50, 20, 10], 'dropout_threshold' : [0, 0.5, 0.5, 0.5], 'regularizer_threshold' : 0.1, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 3, 'neuron_layer' : [1000, 500, 100, 50, 10], 'dropout_threshold' : [0, 0.3, 0.5, 0, 0.4, 0.5], 'regularizer_threshold' : 0.1, 'opt' : optimizers.Adam(lr=args.lr)},
+	{'input_dims' : 10, 'output_dims' : 14, 'neuron_layer' : [100, 50, 5, 50, 100], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.1, 'opt' : optimizers.SGD(lr=args.lr, clipnorm=1.)},
+	{'input_dims' : 10, 'output_dims' : 14, 'neuron_layer' : [200, 100, 50, 100, 200], 'dropout_threshold' : [0, 0.3, 0.3, 0.3, 0.3, 0.3], 'regularizer_threshold' : 0.1, 'opt' : optimizers.Adam(lr=args.lr)},
 	]
 
 import tensorflow as tf
@@ -62,7 +62,7 @@ for model_ver in hyper_param_search:
 	X_train, Y_train, X_val, Y_val, X_test, Y_test = train_val_test_split(train_data, target_data, split_ratio = args.split_ratio, verbose = args.verbose)
 
 	# The tensorboard log directory will be a unique subdirectory based on the start time fo the run
-	TBLOGDIR="../logs/{}".format(get_start_time())
+	TBLOGDIR="../logs2/{}".format(get_start_time())
 
 	# Defining the callbacks for training 
 	tensorboard = TensorBoard(log_dir=TBLOGDIR, histogram_freq=0, batch_size=args.batch_size)
